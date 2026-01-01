@@ -1,16 +1,17 @@
+'use strict';
 
 // frame per milisecond
 const FPS = 1000;
 
 document.addEventListener('DOMContentLoaded', function() {
   let values = get_values();
-  dataset = dataset_load(values);
+  let dataset = dataset_load(values);
   dataset_switch(dataset, 0, 1);
 });
 
 function array_sum(values) {
   let total = 0;
-  for (value of values) {
+  for (let value of values) {
     total += value;
   }
   return total;
@@ -18,7 +19,7 @@ function array_sum(values) {
 
 function array_max(values) {
   let max = 0;
-  for (value of values) {
+  for (let value of values) {
     if (max < value) {
       max = value;
     }
