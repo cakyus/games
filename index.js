@@ -1,7 +1,11 @@
 
+// frame per milisecond
+const FPS = 1000;
+
 document.addEventListener('DOMContentLoaded', function() {
   let values = get_values();
-  add_items(values);
+  dataset = dataset_load(values);
+  dataset_switch(dataset, 0, 1);
 });
 
 function array_sum(values) {
@@ -22,34 +26,104 @@ function array_max(values) {
   return max;
 }
 
+// Randomly shuffle the elements of an array.
+
 function shuffle(values) {
   return values.sort(() => Math.random() - 0.5);
 }
 
 function get_values() {
-  let values = [8, 2, 3, 4, 5, 6, 7, 1, 9, 10];
-  // let values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  let values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   values = shuffle(values);
   return values;
 }
 
-function add_items(values) {
-  let value_max = array_max(values);
-  let min_height = 0;
+function Dataset() {
+  this.data = [];
+  this.length = 0;
+  this.value_max = 0;
+  this.min_height = 0;
+}
+
+function Data() {
+  this.node = undefined;
+  this.value = undefined;
+}
+
+function dataset_load(values) {
+
   let e = document.getElementById('chart');
+
+  let dataset = new Dataset();
+  dataset.value_max = array_max(values);
+  dataset.length = values.length;
+
   for (let i = 0; i < values.length ; i++) {
+
     let e1 = document.createElement('div');
-    let x = 0;
-    x = values[i] / value_max;
-    x = ( 100 - min_height ) * x;
-    x = parseInt(x);
-    x = min_height + x;
-    e1.style.height = x + '%';
-    x = 100 * ( 1 / values.length );
-    x = parseInt(x);
-    e1.style.width = x + '%';
-    e1.innerHTML = values[i];
     e.appendChild(e1);
+
+    let data = new Data();
+    data.node = e1;
+    dataset.data.push(data);
+    dataset_set_value(dataset, i, values[i]);
   }
+
+  return dataset;
+}
+
+function dataset_set_value(dataset, index, value) {
+
+  let data = dataset.data[index]
+
+  data.value = value;
+
+  let x = 0;
+  x = value / dataset.value_max;
+  x = ( 100 - dataset.min_height ) * x;
+  x = parseInt(x);
+  x = dataset.min_height + x;
+  data.node.style.height = x + '%';
+
+  let y = 0;
+  y = 100 * ( 1 / dataset.length );
+  y = parseInt(y);
+  data.node.style.width = y + '%';
+  data.node.innerHTML = value;
+}
+
+// Switch position
+
+function dataset_switch(dataset, index1, index2) {
+
+  window.setTimeout(function() {
+
+    dataset_select_begin(dataset, index1, index2);
+
+    window.setTimeout(function() {
+
+      let height1 = dataset.data[index1].node.style.height;
+      let height2 = dataset.data[index2].node.style.height;
+
+      dataset.data[index1].node.style.height = height2;
+      dataset.data[index2].node.style.height = height1;
+
+      window.setTimeout(function() {
+        dataset_select_end(dataset, index1, index2);
+      }, FPS);
+
+    }, FPS);
+
+  }, FPS);
+}
+
+function dataset_select_begin(dataset, index1, index2) {
+  dataset.data[index1].node.style.backgroundColor = '#f00';
+  dataset.data[index2].node.style.backgroundColor = '#f00';
+}
+
+function dataset_select_end(dataset, index1, index2) {
+  dataset.data[index1].node.style.backgroundColor = '#fff';
+  dataset.data[index2].node.style.backgroundColor = '#fff';
 }
 
